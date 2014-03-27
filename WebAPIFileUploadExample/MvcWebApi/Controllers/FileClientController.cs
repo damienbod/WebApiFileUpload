@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace MvcWebApi.Controllers
 {
     public class FileClientController : Controller
     {
-        public ActionResult MvcUpload()
-        {
-            ViewBag.Title = "Index Page";
-
-            return View();
-        }
-
         public ActionResult Index()
         {
             ViewBag.Title = "Index Page";

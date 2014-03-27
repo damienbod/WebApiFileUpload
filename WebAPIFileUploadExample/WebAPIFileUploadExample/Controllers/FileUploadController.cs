@@ -1,47 +1,45 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 
 namespace WebAPIDocumentationHelp.Controllers
 {
     [RoutePrefix("api/test")]
+    [ValidateMimeMultipartContentFilter]
     public class FileUploadController : ApiController
     {
         private static readonly string ServerUploadFolder = "C:\\Temp"; //Path.GetTempPath();
 
         [Route("file")]
         [HttpPost]
-        public async Task<FileResult> UploadFile()
+        public async Task<FileResult> UploadSingleFile()
         {
-            if (!Request.Content.IsMimeMultipartContent("form-data"))
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.UnsupportedMediaType));
-            }
-
-            MultipartFormDataStreamProvider streamProvider = new MultipartFormDataStreamProvider(ServerUploadFolder);
+            var streamProvider = new MultipartFormDataStreamProvider(ServerUploadFolder);
             await Request.Content.ReadAsMultipartAsync(streamProvider);
             return new FileResult
             {
                 FileNames = streamProvider.FileData.Select(entry => entry.LocalFileName),
-                Submitter = streamProvider.FormData["submitter"]
+                Description = streamProvider.FormData["description"],
+                CreatedTimestamp = DateTime.UtcNow,
+                UpdatedTimestamp = DateTime.UtcNow, 
+                DownloadLink = "TODO, will implement when file is persisited"
             };
         }
 
         [Route("multiplefiles")]
         [HttpPost]
-        public async Task<HttpResponseMessage> PostFile()
+        [ValidateMimeMultipartContentFilter]
+        public async Task<HttpResponseMessage> UploadMultipleFiles()
         {
-            if (!Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
-
             var provider = new MultipartFormDataStreamProvider(ServerUploadFolder);
-
             try
             {
                 var sb = new StringBuilder();
@@ -50,7 +48,7 @@ namespace WebAPIDocumentationHelp.Controllers
 
                 foreach (var file in provider.FileData)
                 {
-                    FileInfo fileInfo = new FileInfo(file.LocalFileName);
+                    var fileInfo = new FileInfo(file.LocalFileName);
                     sb.Append(string.Format("Uploaded file: {0} ({1} bytes)\n", fileInfo.Name, fileInfo.Length));
                 }
                 return new HttpResponseMessage()
@@ -63,7 +61,6 @@ namespace WebAPIDocumentationHelp.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-
 
         private StreamContent StreamConversion()
         {
@@ -84,6 +81,23 @@ namespace WebAPIDocumentationHelp.Controllers
             }
             return streamContent;
         }
+    }
+
+    public class ValidateMimeMultipartContentFilter : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            if (!actionContext.Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+        }
+
+        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        {
+
+        }
+
     }
 }
 

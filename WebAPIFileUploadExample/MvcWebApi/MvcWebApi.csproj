@@ -135,7 +135,6 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\FileClientController.cs" />
-    <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -185,7 +184,6 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\FileClient\Client.cshtml" />
     <Content Include="Views\FileClient\MultiClient.cshtml" />
-    <Content Include="Views\FileClient\MvcUpload.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
