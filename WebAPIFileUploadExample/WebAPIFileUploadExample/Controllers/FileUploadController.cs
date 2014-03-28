@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
 
 namespace WebAPIDocumentationHelp.Controllers
 {
@@ -18,7 +14,7 @@ namespace WebAPIDocumentationHelp.Controllers
     {
         private static readonly string ServerUploadFolder = "C:\\Temp"; //Path.GetTempPath();
 
-        [Route("file")]
+        [Route("files")]
         [HttpPost]
         public async Task<FileResult> UploadSingleFile()
         {
