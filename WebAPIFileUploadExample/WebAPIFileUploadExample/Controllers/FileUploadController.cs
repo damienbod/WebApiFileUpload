@@ -9,18 +9,18 @@ using System.Web.Http;
 namespace WebAPIDocumentationHelp.Controllers
 {
     [RoutePrefix("api/test")]
-    [ValidateMimeMultipartContentFilter]
     public class FileUploadController : ApiController
     {
         private static readonly string ServerUploadFolder = "C:\\Temp"; //Path.GetTempPath();
 
         [Route("files")]
         [HttpPost]
+        [ValidateMimeMultipartContentFilter]
         public async Task<FileResult> UploadSingleFile()
         {
             var streamProvider = new MultipartFormDataStreamProvider(ServerUploadFolder);
             await Request.Content.ReadAsMultipartAsync(streamProvider);
-   
+
             return new FileResult
             {
                 FileNames = streamProvider.FileData.Select(entry => entry.LocalFileName),
@@ -33,7 +33,7 @@ namespace WebAPIDocumentationHelp.Controllers
             };
         }
 
-        [Route("multiplefiles")]
+        [Route("filesNoContentType")]
         [HttpPost]
         [ValidateMimeMultipartContentFilter]
         public async Task<FileResult> UploadMultipleFiles2()
@@ -46,8 +46,7 @@ namespace WebAPIDocumentationHelp.Controllers
                 return new FileResult
                 {
                     FileNames = provider.FileData.Select(entry => entry.LocalFileName),
-                    Names = provider.FileData.Select(entry => entry.Headers.ContentDisposition.FileName),
-                    ContentTypes = provider.FileData.Select(entry => entry.Headers.ContentType.MediaType),
+                    Names = provider.FileData.Select(entry => entry.Headers.ContentDisposition.FileName),                  
                     Description = provider.FormData["description"],
                     CreatedTimestamp = DateTime.UtcNow,
                     UpdatedTimestamp = DateTime.UtcNow,
