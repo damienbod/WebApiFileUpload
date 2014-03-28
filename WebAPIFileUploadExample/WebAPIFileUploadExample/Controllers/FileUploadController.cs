@@ -24,9 +24,12 @@ namespace WebAPIDocumentationHelp.Controllers
         {
             var streamProvider = new MultipartFormDataStreamProvider(ServerUploadFolder);
             await Request.Content.ReadAsMultipartAsync(streamProvider);
+   
             return new FileResult
             {
                 FileNames = streamProvider.FileData.Select(entry => entry.LocalFileName),
+                Names = streamProvider.FileData.Select(entry => entry.Headers.ContentDisposition.FileName),
+                ContentTypes = streamProvider.FileData.Select(entry => entry.Headers.ContentType.MediaType),
                 Description = streamProvider.FormData["description"],
                 CreatedTimestamp = DateTime.UtcNow,
                 UpdatedTimestamp = DateTime.UtcNow, 
@@ -37,28 +40,27 @@ namespace WebAPIDocumentationHelp.Controllers
         [Route("multiplefiles")]
         [HttpPost]
         [ValidateMimeMultipartContentFilter]
-        public async Task<HttpResponseMessage> UploadMultipleFiles()
+        public async Task<FileResult> UploadMultipleFiles2()
         {
             var provider = new MultipartFormDataStreamProvider(ServerUploadFolder);
             try
             {
-                var sb = new StringBuilder();
-                var stream = StreamConversion();
-                await stream.ReadAsMultipartAsync(provider);
-
-                foreach (var file in provider.FileData)
+                var streamProvider = StreamConversion();
+                await streamProvider.ReadAsMultipartAsync(provider);
+                return new FileResult
                 {
-                    var fileInfo = new FileInfo(file.LocalFileName);
-                    sb.Append(string.Format("Uploaded file: {0} ({1} bytes)\n", fileInfo.Name, fileInfo.Length));
-                }
-                return new HttpResponseMessage()
-                {
-                    Content = new StringContent(sb.ToString())
+                    FileNames = provider.FileData.Select(entry => entry.LocalFileName),
+                    Names = provider.FileData.Select(entry => entry.Headers.ContentDisposition.FileName),
+                    ContentTypes = provider.FileData.Select(entry => entry.Headers.ContentType.MediaType),
+                    Description = provider.FormData["description"],
+                    CreatedTimestamp = DateTime.UtcNow,
+                    UpdatedTimestamp = DateTime.UtcNow,
+                    DownloadLink = "TODO, will implement when file is persisited"
                 };
             }
             catch (System.Exception e)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+                throw new HttpResponseException(HttpStatusCode.InternalServerError);
             }
         }
 
@@ -81,23 +83,9 @@ namespace WebAPIDocumentationHelp.Controllers
             }
             return streamContent;
         }
-    }
-
-    public class ValidateMimeMultipartContentFilter : ActionFilterAttribute
-    {
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            if (!actionContext.Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
-        }
-
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-        {
-
-        }
 
     }
+
+
 }
 

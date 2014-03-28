@@ -10,5 +10,7 @@ namespace WebAPIDocumentationHelp.Controllers
         public DateTime CreatedTimestamp { get; set; }
         public DateTime UpdatedTimestamp { get; set; }
         public string DownloadLink { get; set; }
+        public IEnumerable<string> ContentTypes { get; set; }
+        public IEnumerable<string> Names { get; set; }
     }
 }

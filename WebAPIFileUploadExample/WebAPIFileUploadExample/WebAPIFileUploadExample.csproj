@@ -117,6 +117,7 @@
   <ItemGroup>
     <Compile Include="Controllers\FileResult.cs" />
     <Compile Include="Controllers\FileUploadController.cs" />
+    <Compile Include="Controllers\ValidateMimeMultipartContentFilter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unity.SelfHostWebApiOwin\Startup.cs" />
